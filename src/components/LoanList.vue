@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { LoanApplication } from '../types/loan'
 import { calculateMonthlyPayment } from '../services/loanService'
+import DeleteModal from './DeleteModal.vue'
 
 defineProps<{
   loans: LoanApplication[]
@@ -13,13 +15,24 @@ const emit = defineEmits<{
   delete: [id: string]
 }>()
 
-function handleDelete(id: string, applicantName: string) {
-  const confirmed = window.confirm(
-    `Are you sure you want to delete the loan application for ${applicantName}?`
-  )
-  if (confirmed) {
-    emit('delete', id)
+const showDeleteModal = ref(false)
+const loanToDelete = ref<{ id: string; applicantName: string } | null>(null)
+
+function openDeleteModal(id: string, applicantName: string) {
+  loanToDelete.value = { id, applicantName }
+  showDeleteModal.value = true
+}
+
+function confirmDelete() {
+  if (loanToDelete.value) {
+    emit('delete', loanToDelete.value.id)
   }
+  closeDeleteModal()
+}
+
+function closeDeleteModal() {
+  showDeleteModal.value = false
+  loanToDelete.value = null
 }
 
 function formatCurrency(value: number): string {
@@ -105,11 +118,14 @@ function formatDate(isoDate: string): string {
                 ⚡
               </button>
               <button
-                class="action-btn danger"
-                @click="handleDelete(loan.id, loan.applicantName)"
+                v-if="loan.status === 'pending'"
+                class="action-btn delete-icon-btn"
+                @click="openDeleteModal(loan.id, loan.applicantName)"
                 title="Delete"
               >
-                🗑
+                <svg class="delete-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                </svg>
               </button>
               <span v-if="loan.status !== 'pending'" class="no-actions">—</span>
             </td>
@@ -117,6 +133,13 @@ function formatDate(isoDate: string): string {
         </tbody>
       </table>
     </div>
+
+    <DeleteModal
+      v-if="showDeleteModal && loanToDelete"
+      :applicant-name="loanToDelete.applicantName"
+      @confirm="confirmDelete"
+      @cancel="closeDeleteModal"
+    />
   </div>
 </template>
 
@@ -149,6 +172,25 @@ function formatDate(isoDate: string): string {
 
 .action-btn:last-child {
   margin-right: 0;
+}
+
+.delete-icon-btn {
+  background-color: transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+}
+
+.delete-icon-btn:hover {
+  color: var(--danger-color);
+  background-color: var(--danger-light);
+}
+
+.delete-icon {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .no-actions {
