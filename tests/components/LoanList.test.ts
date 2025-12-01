@@ -148,7 +148,7 @@ describe('LoanList', () => {
       })
 
       const actionButtons = wrapper.findAll('.action-btn')
-      expect(actionButtons.length).toBe(3) // approve, reject, auto-decide
+      expect(actionButtons.length).toBe(4) // approve, reject, auto-decide, delete
     })
 
     it('shows approve button with checkmark', () => {
