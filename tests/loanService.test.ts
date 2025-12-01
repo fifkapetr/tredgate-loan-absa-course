@@ -61,6 +61,13 @@ describe('loanService', () => {
       const loans = getLoans()
       expect(loans).toEqual(storedLoans)
     })
+
+    it('returns empty array when localStorage contains invalid JSON', () => {
+      localStorageMock.setItem('tredgate_loans', 'invalid json{{{')
+
+      const loans = getLoans()
+      expect(loans).toEqual([])
+    })
   })
 
   describe('saveLoans', () => {
