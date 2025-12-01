@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, type VueWrapper } from '@vue/test-utils'
 import LoanForm from '../../src/components/LoanForm.vue'
 import * as loanService from '../../src/services/loanService'
 
