@@ -5,11 +5,14 @@ import { getLoans, updateLoanStatus, autoDecideLoan, deleteLoan } from './servic
 import LoanForm from './components/LoanForm.vue'
 import LoanList from './components/LoanList.vue'
 import LoanSummary from './components/LoanSummary.vue'
+import AuditLogViewer from './components/AuditLogViewer.vue'
 
 const loans = ref<LoanApplication[]>([])
+const auditLogViewer = ref<InstanceType<typeof AuditLogViewer> | null>(null)
 
 function refreshLoans() {
   loans.value = getLoans()
+  auditLogViewer.value?.refreshLogs()
 }
 
 function handleApprove(id: string) {
@@ -58,6 +61,7 @@ onMounted(() => {
           @auto-decide="handleAutoDecide"
           @delete="handleDelete"
         />
+        <AuditLogViewer ref="auditLogViewer" />
       </div>
     </main>
   </div>

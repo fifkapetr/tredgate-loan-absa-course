@@ -1,4 +1,5 @@
 import type { LoanApplication, LoanStatus, CreateLoanInput } from '../types/loan'
+import { logLoanCreated, logManualStatusChange, logAutoDecision, logLoanDeleted } from './auditLogService'
 
 const STORAGE_KEY = 'tredgate_loans'
 
@@ -65,6 +66,9 @@ export function createLoanApplication(input: CreateLoanInput): LoanApplication {
   loans.push(newLoan)
   saveLoans(loans)
 
+  // Log audit event
+  logLoanCreated(newLoan)
+
   return newLoan
 }
 
@@ -81,9 +85,17 @@ export function updateLoanStatus(id: string, status: LoanStatus): void {
 
   const loan = loans[loanIndex]
   if (loan) {
+    const previousStatus = loan.status
     loan.status = status
+    saveLoans(loans)
+
+    // Log audit event for manual status change
+    logManualStatusChange(
+      { id: loan.id, applicantName: loan.applicantName, amount: loan.amount },
+      previousStatus,
+      status
+    )
   }
-  saveLoans(loans)
 }
 
 /**
@@ -108,13 +120,24 @@ export function autoDecideLoan(id: string): void {
     throw new Error(`Loan with id ${id} not found`)
   }
 
+  const previousStatus = loan.status
+  let newStatus: LoanStatus
+
   if (loan.amount <= 100000 && loan.termMonths <= 60) {
-    loan.status = 'approved'
+    newStatus = 'approved'
   } else {
-    loan.status = 'rejected'
+    newStatus = 'rejected'
   }
 
+  loan.status = newStatus
   saveLoans(loans)
+
+  // Log audit event for auto-decision
+  logAutoDecision(
+    { id: loan.id, applicantName: loan.applicantName, amount: loan.amount },
+    previousStatus,
+    newStatus
+  )
 }
 
 /**
@@ -128,6 +151,12 @@ export function deleteLoan(id: string): void {
     throw new Error(`Loan with id ${id} not found`)
   }
 
+  const loan = loans[loanIndex]
   loans.splice(loanIndex, 1)
   saveLoans(loans)
+
+  // Log audit event for deletion
+  if (loan) {
+    logLoanDeleted(loan)
+  }
 }
