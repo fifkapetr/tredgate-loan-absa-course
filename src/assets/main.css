@@ -12,9 +12,12 @@
   --border-color: #e0e0e0;
   --success-color: #28a745;
   --danger-color: #dc3545;
+  --danger-hover: #c82333;
+  --danger-light: rgba(220, 53, 69, 0.1);
   --warning-color: #ffc107;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   --border-radius: 8px;
+  --hover-background: #f8f9fa;
 }
 
 * {
