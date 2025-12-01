@@ -14,6 +14,8 @@ dist-ssr
 
 # Test reports
 test-report
+playwright-report
+test-results
 
 # Editor directories and files
 .vscode/*
@@ -25,3 +27,10 @@ test-report
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

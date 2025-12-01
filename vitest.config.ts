@@ -9,6 +9,7 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
+      '**/e2e/**',
       'tests/failing_heal.spec.ts'
     ],
     reporters: ['default', 'html'],
