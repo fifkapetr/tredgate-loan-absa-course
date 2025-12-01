@@ -92,6 +92,7 @@ onMounted(() => {
 
 .left-panel {
   flex-shrink: 0;
+  width: 400px;
 }
 
 .right-panel {
